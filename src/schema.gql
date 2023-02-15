@@ -1,0 +1,141 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type User {
+  id: ID!
+  email: String!
+  password: String!
+  image: String
+  status: String!
+  roles: String!
+}
+
+type Token {
+  access_token: String!
+}
+
+type AuthResponse {
+  token: Token!
+  user: User!
+}
+
+type Category {
+  """Example field (placeholder)"""
+  id: ID!
+  name: String!
+}
+
+type Inventory {
+  id: ID!
+  name: String!
+  status: Boolean!
+  createAt: DateTime!
+  items: [Item!]
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+type Item {
+  id: ID!
+  name: String!
+  createAt: DateTime!
+  status: Boolean!
+  category: Category
+  inventory: Inventory
+}
+
+type Query {
+  users: [User!]!
+  user(id: String!): User!
+  userByUsername(email: String!): User!
+  revalidate: AuthResponse!
+  categories: [Category!]!
+  category(id: String!): Category!
+  items(search: String = ""): [Item!]!
+  item(id: ID!): Item!
+  BCV: Float!
+  inventories: [Inventory!]!
+  inventory(id: ID!): Inventory!
+}
+
+type Mutation {
+  createImage(file: Upload!, name: String!): String!
+  deleteImagen(name: String!): String!
+  createUser(createUserInput: CreateUserInput!): User!
+  updateUser(updateUserInput: UpdateUserInput!): User!
+  removeUser(id: Int!): User!
+  signup(signupInput: SignupInput!): AuthResponse!
+  signin(signinInput: SigninInput!): AuthResponse!
+  createCategory(createCategoryInput: CreateCategoryInput!): Category!
+  updateCategory(updateCategoryInput: UpdateCategoryInput!): Category!
+  removeCategory(id: String!): Category
+  createItem(createItemInput: CreateItemInput!): Item!
+  updateItem(updateItemInput: UpdateItemInput!): Item!
+  updateByInventory(updateItemInput: UpdateItemInput!): Item!
+  removeItem(id: ID!): Item!
+  createInventory(createInventoryInput: CreateInventoryInput!): Inventory!
+  updateInventory(updateInventoryInput: UpdateInventoryInput!): Inventory!
+  removeInventory(id: ID!): Inventory!
+}
+
+"""The `Upload` scalar type represents a file upload."""
+scalar Upload
+
+input CreateUserInput {
+  email: String!
+  password: String!
+  image: String!
+}
+
+input UpdateUserInput {
+  email: String
+  password: String
+  image: String
+  id: Int!
+}
+
+input SignupInput {
+  email: String!
+  password: String!
+}
+
+input SigninInput {
+  email: String!
+  password: String!
+}
+
+input CreateCategoryInput {
+  name: String!
+}
+
+input UpdateCategoryInput {
+  name: String!
+  id: ID!
+}
+
+input CreateItemInput {
+  name: String!
+  idCategory: ID!
+}
+
+input UpdateItemInput {
+  name: String
+  idCategory: ID
+  id: ID!
+  inventoryId: ID
+  status: Boolean
+}
+
+input CreateInventoryInput {
+  name: String!
+}
+
+input UpdateInventoryInput {
+  name: String
+  id: ID!
+  status: Boolean
+}

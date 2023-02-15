@@ -1,0 +1,7 @@
+-- CreateTable
+CREATE TABLE "CurrencyPrice" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "createAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "value" REAL NOT NULL DEFAULT 0,
+    "name" TEXT NOT NULL
+);

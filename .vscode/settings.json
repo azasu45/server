@@ -1,0 +1,9 @@
+{
+  "cSpell.words": ["nestjs"],
+  "auto-close-tag.disableOnLanguage": ["ts"],
+
+  "editor.formatOnSave": true,
+  "[prisma]": {
+    "editor.defaultFormatter": "Prisma.prisma"
+  }
+}

@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  anylistapp:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: nest-graphql
+    container_name: AnylistApp
+    restart: always # reiniciar el contenedor si se detiene
+    ports:
+      - '3001'
+
+    environment:
+      JWT_SECRET: ${JWT_SECRET}
+      DATABASE_URL: ${DATABASE_URL}
