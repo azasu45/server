@@ -4,10 +4,14 @@ import { UpdateItemInput } from './dto/update-item.input';
 import { Item } from './entities/item.entity';
 import { PrismaService } from '../prisma.service';
 import { SearchArgs } from '../common/dto/args/search.args';
+import { UploaderService } from '../uploader/uploader.service';
 
 @Injectable()
 export class ItemService {
-  constructor(@Inject(PrismaService) private prisma: PrismaService) {}
+  constructor(
+    @Inject(PrismaService) private prisma: PrismaService,
+    @Inject(UploaderService) private uploaderService: UploaderService,
+  ) {}
 
   async create(
     idCategory: string,
@@ -25,6 +29,8 @@ export class ItemService {
           },
         },
       });
+      if (item)
+        await this.uploaderService.uploadImage(item.id, createItemInput.file);
       return item;
     } catch (e) {
       console.log(e);
@@ -33,25 +39,15 @@ export class ItemService {
 
   async findAll(searchArgs: SearchArgs): Promise<Item[]> {
     return await this.prisma.item.findMany({
-      where: {
-        inventoryId:
-          searchArgs.search.length !== 0 ? searchArgs.search : undefined,
-      },
-      include: {
-        category: true,
-        inventory: true,
-      },
+      include: { category: true, inventoryItem: true },
     });
   }
 
   async findAllByInventory(searchArgs: SearchArgs): Promise<Item[]> {
     return await this.prisma.item.findMany({
-      where: {
-        inventoryId:
-          searchArgs.search.length !== 0 ? searchArgs.search : undefined,
-      },
       include: {
         category: true,
+        inventoryItem: true,
       },
     });
   }
@@ -63,7 +59,6 @@ export class ItemService {
       },
       include: {
         category: true,
-        inventory: true,
       },
     });
     if (!item) throw new NotFoundException(`item con el id no existe ${id}`);
@@ -73,6 +68,8 @@ export class ItemService {
   async update(id: string, updateItemInput: UpdateItemInput): Promise<Item> {
     const { name, idCategory, status } = updateItemInput;
     await this.findOne(id);
+    if (updateItemInput.file)
+      this.uploaderService.uploadImage(id, updateItemInput.file);
     try {
       return await this.prisma.item.update({
         where: {
@@ -85,26 +82,6 @@ export class ItemService {
           name,
           idCategory,
           status,
-        },
-      });
-    } catch (e) {
-      console.log(e);
-    }
-  }
-
-  async updateByInventory(id: string, inventoryId: string): Promise<Item> {
-    console.log(inventoryId);
-    await this.findOne(id);
-    try {
-      return await this.prisma.item.update({
-        where: {
-          id,
-        },
-        data: {
-          inventoryId: inventoryId,
-        },
-        include: {
-          inventory: true,
         },
       });
     } catch (e) {

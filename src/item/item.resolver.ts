@@ -35,16 +35,6 @@ export class ItemResolver {
   }
 
   @Mutation(() => Item)
-  async updateByInventory(
-    @Args('updateItemInput') updateItemInput: UpdateItemInput,
-  ): Promise<Item> {
-    return this.itemService.updateByInventory(
-      updateItemInput.id,
-      updateItemInput.inventoryId,
-    );
-  }
-
-  @Mutation(() => Item)
   async removeItem(
     @Args('id', { type: () => ID }, ParseUUIDPipe) id: string,
   ): Promise<Item | null> {

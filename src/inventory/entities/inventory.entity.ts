@@ -1,6 +1,6 @@
 import { ObjectType, Field, ID } from '@nestjs/graphql';
 import { IsString, IsUUID, IsBoolean, IsDate } from 'class-validator';
-import { Item } from 'src/item/entities/item.entity';
+import { InventoryItem } from 'src/inventory-item/entities/inventory-item.entity';
 
 @ObjectType()
 export class Inventory {
@@ -20,6 +20,6 @@ export class Inventory {
   @IsDate()
   createAt?: Date;
 
-  @Field(() => [Item], { nullable: true })
-  items?: Item[];
+  @Field(() => [InventoryItem], { nullable: true })
+  inventoryItems?: InventoryItem[] | null;
 }

@@ -1,5 +1,5 @@
 import { ObjectType, Field, ID } from '@nestjs/graphql';
-import { IsUUID, IsString, IsNotEmpty, Length } from 'class-validator';
+import { IsUUID, IsString } from 'class-validator';
 
 @ObjectType()
 export class Category {
@@ -9,8 +9,6 @@ export class Category {
 
   @Field(() => String)
   @IsString()
-  @IsNotEmpty()
-  @Length(5, 100)
   name: string;
 
   /*Items Relation*/

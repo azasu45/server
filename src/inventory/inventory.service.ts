@@ -21,7 +21,19 @@ export class InventoryService {
 
   async findAll(): Promise<Inventory[]> {
     try {
-      return await this.prisma.inventory.findMany();
+      return await this.prisma.inventory.findMany({
+        include: {
+          inventoryItems: {
+            include: {
+              item: {
+                include: {
+                  category: true,
+                },
+              },
+            },
+          },
+        },
+      });
     } catch {}
   }
 
@@ -31,7 +43,19 @@ export class InventoryService {
         id,
       },
       include: {
-        items: true,
+        inventoryItems: {
+          include: {
+            item: {
+              select: {
+                id: true,
+                name: true,
+                createAt: true,
+                status: true,
+                category: true,
+              },
+            },
+          },
+        },
       },
     });
   }

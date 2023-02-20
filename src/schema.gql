@@ -26,12 +26,21 @@ type Category {
   name: String!
 }
 
-type Inventory {
+type InventoryItem {
+  id: ID!
+  itemId: ID
+  inventoryId: ID
+  item: Item
+}
+
+type Item {
   id: ID!
   name: String!
-  status: Boolean!
   createAt: DateTime!
-  items: [Item!]
+  status: Boolean!
+  file: Upload
+  category: Category
+  inventoryItem: InventoryItem
 }
 
 """
@@ -39,13 +48,27 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 """
 scalar DateTime
 
-type Item {
+"""The `Upload` scalar type represents a file upload."""
+scalar Upload
+
+type Inventory {
   id: ID!
   name: String!
-  createAt: DateTime!
   status: Boolean!
-  category: Category
-  inventory: Inventory
+  createAt: DateTime!
+  inventoryItems: [InventoryItem!]
+}
+
+type PriceDetail {
+  id: ID!
+  createAt: DateTime!
+  quantity: Float!
+  price: Float!
+  status: Boolean!
+  autoUpdate: Boolean!
+  description: String!
+  inventoryItemId: ID!
+  InventoryItem: InventoryItem!
 }
 
 type Query {
@@ -60,10 +83,13 @@ type Query {
   BCV: Float!
   inventories: [Inventory!]!
   inventory(id: ID!): Inventory!
+  inventoryItems: [InventoryItem!]!
+  inventoryItem(id: String!): InventoryItem!
+  priceDetail(id: String!): PriceDetail!
 }
 
 type Mutation {
-  createImage(file: Upload!, name: String!): String!
+  createImage(fileInput: FileInput!): Boolean!
   deleteImagen(name: String!): String!
   createUser(createUserInput: CreateUserInput!): User!
   updateUser(updateUserInput: UpdateUserInput!): User!
@@ -75,15 +101,22 @@ type Mutation {
   removeCategory(id: String!): Category
   createItem(createItemInput: CreateItemInput!): Item!
   updateItem(updateItemInput: UpdateItemInput!): Item!
-  updateByInventory(updateItemInput: UpdateItemInput!): Item!
   removeItem(id: ID!): Item!
   createInventory(createInventoryInput: CreateInventoryInput!): Inventory!
   updateInventory(updateInventoryInput: UpdateInventoryInput!): Inventory!
   removeInventory(id: ID!): Inventory!
+  createInventoryItem(createInventoryItemInput: CreateInventoryItemInput!): InventoryItem!
+  updateInventoryItem(updateInventoryItemInput: UpdateInventoryItemInput!): InventoryItem!
+  removeInventoryItem(id: String!): InventoryItem!
+  createPriceDetail(createPriceDetailInput: CreatePriceDetailInput!): PriceDetail!
+  updatePriceDetail(updatePriceDetailInput: UpdatePriceDetailInput!): PriceDetail!
+  removePriceDetail(id: String!): PriceDetail!
 }
 
-"""The `Upload` scalar type represents a file upload."""
-scalar Upload
+input FileInput {
+  name: String!
+  file: Upload!
+}
 
 input CreateUserInput {
   email: String!
@@ -120,11 +153,13 @@ input UpdateCategoryInput {
 input CreateItemInput {
   name: String!
   idCategory: ID!
+  file: Upload!
 }
 
 input UpdateItemInput {
   name: String
   idCategory: ID
+  file: Upload
   id: ID!
   inventoryId: ID
   status: Boolean
@@ -138,4 +173,37 @@ input UpdateInventoryInput {
   name: String
   id: ID!
   status: Boolean
+}
+
+input CreateInventoryItemInput {
+  itemId: ID!
+  inventoryId: ID!
+}
+
+input UpdateInventoryItemInput {
+  itemId: ID
+  inventoryId: ID
+  id: ID!
+}
+
+input CreatePriceDetailInput {
+  id: ID!
+  createAt: DateTime!
+  quantity: Float!
+  price: Float!
+  status: Boolean!
+  autoUpdate: Boolean!
+  description: String!
+  inventoryItemId: ID!
+}
+
+input UpdatePriceDetailInput {
+  id: ID!
+  createAt: DateTime
+  quantity: Float
+  price: Float
+  status: Boolean
+  autoUpdate: Boolean
+  description: String
+  inventoryItemId: ID
 }

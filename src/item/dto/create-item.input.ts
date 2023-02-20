@@ -1,5 +1,7 @@
 import { InputType, Field, ID } from '@nestjs/graphql';
-import { IsNotEmpty, IsUUID, Length } from 'class-validator';
+import { IsNotEmpty, IsOptional, IsUUID, Length } from 'class-validator';
+import * as GraphQLUpload from 'graphql-upload/GraphQLUpload.js';
+import { FileUpload } from 'src/common/types';
 
 @InputType()
 export class CreateItemInput {
@@ -12,4 +14,8 @@ export class CreateItemInput {
   @IsUUID()
   @IsNotEmpty()
   idCategory: string;
+
+  @Field(() => GraphQLUpload)
+  @IsOptional()
+  file: Promise<FileUpload>;
 }

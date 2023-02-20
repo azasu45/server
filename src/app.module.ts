@@ -15,14 +15,18 @@ import { ItemModule } from './item/item.module';
 import { TasksModule } from './tasks/tasks.module';
 import { InventoryModule } from './inventory/inventory.module';
 import { CommonModule } from './common/common.module';
+import { config } from './config/configuration';
+import { UploaderModule } from './uploader/uploader.module';
+import { InventoryItemModule } from './inventory-item/inventory-item.module';
+import { PriceDetailModule } from './price-detail/price-detail.module';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({ load: [config] }),
     ServeStaticModule.forRoot({
       rootPath: resolve(__dirname, '../client'),
       serveRoot: '/',
     }),
-    ConfigModule.forRoot(),
     GraphQLModule.forRootAsync({
       driver: ApolloDriver,
       imports: [ScheduleModule.forRoot()],
@@ -41,6 +45,7 @@ import { CommonModule } from './common/common.module';
         },
       }),
     }),
+    UploaderModule,
     CommonModule,
     UsersModule,
     AuthModule,
@@ -48,6 +53,9 @@ import { CommonModule } from './common/common.module';
     ItemModule,
     TasksModule,
     InventoryModule,
+    UploaderModule,
+    InventoryItemModule,
+    PriceDetailModule,
   ],
   controllers: [],
   providers: [],

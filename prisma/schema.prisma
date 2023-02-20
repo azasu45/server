@@ -73,30 +73,47 @@ model Category {
   id    String @id @default(uuid())
   name  String @unique
   items Item[]
-  //Add By 
 }
 
 model Item {
-  id           String        @id @default(uuid())
-  name         String        @unique
-  status       Boolean?      @default(true)
-  createAt     DateTime      @default(now())
-  lastUpdateAt DateTime      @updatedAt
-  lastUpdateBy String?
-  idCategory   String
-  inventoryId  String?
-  //Add by 
-  category     Category      @relation(fields: [idCategory], references: [id], onDelete: Cascade)
-  inventory    Inventory?    @relation(fields: [inventoryId], references: [id])
-  prices       PriceDetail[]
+  id            String         @id @default(uuid())
+  name          String         @unique
+  status        Boolean?       @default(true)
+  createAt      DateTime       @default(now())
+  lastUpdateAt  DateTime       @updatedAt
+  lastUpdateBy  String?
+  idCategory    String
+  category      Category       @relation(fields: [idCategory], references: [id], onDelete: Cascade)
+  inventoryItem InventoryItem?
+}
+
+model Inventory {
+  id             String          @id @default(uuid())
+  name           String          @unique
+  status         Boolean         @default(true)
+  createAt       DateTime        @default(now())
+  inventoryItems InventoryItem[]
+}
+
+model InventoryItem {
+  id            String        @id @default(uuid())
+  inventoryId   String?
+  itemId        String?       @unique
+  item          Item?         @relation(fields: [itemId], references: [id], onDelete: SetNull)
+  inventory     Inventory?    @relation(fields: [inventoryId], references: [id], onDelete: SetNull)
+  pricesDetails PriceDetail[]
 }
 
 model PriceDetail {
-  id          String  @id @default(uuid())
-  price       Float
-  description String
-  itemId      String?
-  item        Item?   @relation(fields: [itemId], references: [id])
+  id              String         @id @default(uuid())
+  createAt        DateTime       @default(now())
+  quantity        Float          @default(0)
+  price           Float          @default(0)
+  status          Boolean        @default(true)
+  autoUpdate      Boolean        @default(false)
+  description     String         @default("")
+  inventoryItemId String?
+  InventoryItem   InventoryItem? @relation(fields: [inventoryItemId], references: [id])
 }
 
 model CurrencyPrice {
@@ -122,13 +139,4 @@ model AccountsC {
   number            Int                 @default(0)
   descripcion       String
   accountingEntries AccountingEntries[]
-}
-
-model Inventory {
-  id       String   @id @default(uuid())
-  name     String   @unique
-  status   Boolean  @default(true)
-  createAt DateTime @default(now())
-  items    Item[]
-  // karder KardexItem? @relation()
 }

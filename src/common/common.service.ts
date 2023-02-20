@@ -1,13 +1,13 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Inject } from '@nestjs/common';
 import { createWriteStream } from 'fs';
 import { unlink } from 'fs';
-import { FileUpload } from './types';
+import { FileInput } from './dto';
 
 @Injectable()
 export class CommonService {
   async deleteImage(name: string): Promise<boolean> {
     try {
-      await unlink(`client/public/images/${name}.png`, (err) => {
+      unlink(`client/public/images/${name}.png`, (err) => {
         if (err) throw err;
         console.log('se borro el archivo');
       });
@@ -17,14 +17,16 @@ export class CommonService {
     }
   }
 
-  async createImagen(file: FileUpload, name: string): Promise<boolean> {
-    const { createReadStream, filename } = file;
+  async createImagen(fileInput: FileInput): Promise<boolean> {
+    const { createReadStream, filename } = await fileInput.file;
     try {
       return new Promise(async (resolve, reject) =>
         createReadStream()
           .pipe(
             createWriteStream(
-              `./client/public/images/${name ? `${name}.png` : filename}`,
+              `./client/public/images/${
+                fileInput.name ? `${fileInput.name}.png` : filename
+              }`,
             ),
           )
           .on('finish', () => resolve(true))

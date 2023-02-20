@@ -16,6 +16,14 @@
     "noImplicitAny": false,
     "strictBindCallApply": false,
     "forceConsistentCasingInFileNames": false,
-    "noFallthroughCasesInSwitch": false
+    "noFallthroughCasesInSwitch": false,
+    "paths": {
+      "@app/uploader": [
+        "libs/uploader/src"
+      ],
+      "@app/uploader/*": [
+        "libs/uploader/src/*"
+      ]
+    }
   }
 }

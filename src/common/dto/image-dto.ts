@@ -1,12 +1,15 @@
 import { Field, InputType } from '@nestjs/graphql';
-import { FileUpload } from '../types';
 import * as GraphQLUpload from 'graphql-upload/GraphQLUpload.js';
+import { FileUpload } from '../types';
+import { IsOptional } from 'class-validator';
 
 @InputType()
-export class ImagenInput {
-  @Field(() => GraphQLUpload)
-  file: FileUpload;
-
+export class FileInput {
   @Field(() => String)
+  @IsOptional()
   name: string;
+
+  @Field(() => GraphQLUpload)
+  @IsOptional()
+  file: Promise<FileUpload>;
 }
