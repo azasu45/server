@@ -21,19 +21,7 @@ export class InventoryService {
 
   async findAll(): Promise<Inventory[]> {
     try {
-      return await this.prisma.inventory.findMany({
-        include: {
-          inventoryItems: {
-            include: {
-              item: {
-                include: {
-                  category: true,
-                },
-              },
-            },
-          },
-        },
-      });
+      return await this.prisma.inventory.findMany();
     } catch {}
   }
 
@@ -41,21 +29,6 @@ export class InventoryService {
     return this.prisma.inventory.findUnique({
       where: {
         id,
-      },
-      include: {
-        inventoryItems: {
-          include: {
-            item: {
-              select: {
-                id: true,
-                name: true,
-                createAt: true,
-                status: true,
-                category: true,
-              },
-            },
-          },
-        },
       },
     });
   }

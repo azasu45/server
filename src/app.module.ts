@@ -18,7 +18,9 @@ import { CommonModule } from './common/common.module';
 import { config } from './config/configuration';
 import { UploaderModule } from './uploader/uploader.module';
 import { InventoryItemModule } from './inventory-item/inventory-item.module';
-import { PriceDetailModule } from './price-detail/price-detail.module';
+import { ItemDetailModule } from './item-detail/item-detail.module';
+import { AppConfModule } from './app-conf/app-conf.module';
+import { PosModule } from './pos/pos.module';
 
 @Module({
   imports: [
@@ -45,6 +47,7 @@ import { PriceDetailModule } from './price-detail/price-detail.module';
         },
       }),
     }),
+
     UploaderModule,
     CommonModule,
     UsersModule,
@@ -55,7 +58,9 @@ import { PriceDetailModule } from './price-detail/price-detail.module';
     InventoryModule,
     UploaderModule,
     InventoryItemModule,
-    PriceDetailModule,
+    ItemDetailModule,
+    AppConfModule,
+    PosModule,
   ],
   controllers: [],
   providers: [],

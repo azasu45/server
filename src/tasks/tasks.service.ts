@@ -1,17 +1,15 @@
 import { Injectable, Logger } from '@nestjs/common';
+import { Inject } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
 import puppeteer from 'puppeteer';
 import { JSDOM } from 'jsdom';
-import { Inject } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 
 @Injectable()
 export class TasksService {
   private readonly logger = new Logger(TasksService.name);
-  private BCV: number;
-  constructor(@Inject(PrismaService) private prisma: PrismaService) {
-    this.BCV = 0;
-  }
+
+  constructor(@Inject(PrismaService) private prisma: PrismaService) {}
 
   @Cron('0 1 * * * *', {
     timeZone: 'America/Caracas',
@@ -40,7 +38,7 @@ export class TasksService {
     }
   }
 
-  @Cron('0 2 * * * *', {
+  @Cron('0 10 * * * *', {
     timeZone: 'America/Caracas',
   })
   async scraping() {
@@ -55,22 +53,57 @@ export class TasksService {
         window: { document },
       } = new JSDOM(body);
       const strongs = document.querySelectorAll('strong');
-      const BS = parseFloat(strongs[4].textContent.replace(',', '.'));
-      this.BCV = BS;
-      const BCVValue = await this.prisma.currencyPrice.create({
+      const EuroValue = this.prisma.currencyPrice.create({
         data: {
-          name: 'BCV',
-          value: BS,
+          name: 'EUR',
+          symbol: '€',
+          value: parseFloat(strongs[0].textContent.replace(',', '.')),
         },
       });
-      console.log(BCVValue);
+      const YuanValue = this.prisma.currencyPrice.create({
+        data: {
+          name: 'CNY',
+          symbol: '¥',
+          value: parseFloat(strongs[1].textContent.replace(',', '.')),
+        },
+      });
+      const TurkishValue = this.prisma.currencyPrice.create({
+        data: {
+          name: 'TRY',
+          symbol: '₺',
+          value: parseFloat(strongs[2].textContent.replace(',', '.')),
+        },
+      });
+      const RubloValue = this.prisma.currencyPrice.create({
+        data: {
+          name: 'RUB',
+          symbol: '₽',
+          value: parseFloat(strongs[3].textContent.replace(',', '.')),
+        },
+      });
+      const DollarValue = this.prisma.currencyPrice.create({
+        data: {
+          name: 'USD',
+          symbol: '$',
+          value: parseFloat(strongs[4].textContent.replace(',', '.')),
+        },
+      });
+
+      const [euro, yuan, turkish, rublo, dollar] =
+        await this.prisma.$transaction([
+          EuroValue,
+          YuanValue,
+          TurkishValue,
+          RubloValue,
+          DollarValue,
+        ]);
+
+      this.logger.log(
+        `Euro:${euro.value}, Yuan:${yuan.value}, Turkish:${turkish.value}, Rublo:${rublo.value}, Dollar${dollar.value}`,
+      );
       await browser.close();
     } catch (e) {
       this.logger.error('BCV_SCR: ERROR');
     }
-  }
-
-  getBCV(): number {
-    return this.BCV;
   }
 }

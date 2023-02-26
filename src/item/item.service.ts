@@ -59,6 +59,7 @@ export class ItemService {
       },
       include: {
         category: true,
+        inventoryItem: true,
       },
     });
     if (!item) throw new NotFoundException(`item con el id no existe ${id}`);
@@ -80,7 +81,7 @@ export class ItemService {
         },
         data: {
           name,
-          idCategory,
+          categoryId: idCategory,
           status,
         },
       });

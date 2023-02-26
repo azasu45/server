@@ -12,6 +12,19 @@ services:
     container_name: TIENDA_CSP
     volumes:
       - ./postgres:/var/lib/postgresql/data
+  pg:
+    image: dpage/pgadmin4
+    restart: always
+    ports:
+      - 8080:${PGADMIN_LISTEN_PORT}
+    environment:
+      PGADMIN_DEFAULT_PASSWORD: ${POSTGRES_PASSWORD}
+      PGADMIN_DEFAULT_EMAIL: corbos1995@gmail.com
+    depends_on:
+      - db
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
+
 volumes:
   postgres:
-
+  pgadmin-data:

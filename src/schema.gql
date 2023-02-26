@@ -33,24 +33,6 @@ type InventoryItem {
   item: Item
 }
 
-type Item {
-  id: ID!
-  name: String!
-  createAt: DateTime!
-  status: Boolean!
-  file: Upload
-  category: Category
-  inventoryItem: InventoryItem
-}
-
-"""
-A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
-"""
-scalar DateTime
-
-"""The `Upload` scalar type represents a file upload."""
-scalar Upload
-
 type Inventory {
   id: ID!
   name: String!
@@ -59,7 +41,27 @@ type Inventory {
   inventoryItems: [InventoryItem!]
 }
 
-type PriceDetail {
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+type Item {
+  id: ID!
+  name: String!
+  image: String!
+  createAt: DateTime!
+  status: Boolean!
+  file: Upload
+  category: Category
+  inventoryItem: InventoryItem
+  inventory: Inventory
+}
+
+"""The `Upload` scalar type represents a file upload."""
+scalar Upload
+
+type ItemDetail {
   id: ID!
   createAt: DateTime!
   quantity: Float!
@@ -67,8 +69,7 @@ type PriceDetail {
   status: Boolean!
   autoUpdate: Boolean!
   description: String!
-  inventoryItemId: ID!
-  InventoryItem: InventoryItem!
+  itemId: ID!
 }
 
 type Query {
@@ -80,12 +81,14 @@ type Query {
   category(id: String!): Category!
   items(search: String = ""): [Item!]!
   item(id: ID!): Item!
-  BCV: Float!
   inventories: [Inventory!]!
   inventory(id: ID!): Inventory!
   inventoryItems: [InventoryItem!]!
   inventoryItem(id: String!): InventoryItem!
-  priceDetail(id: String!): PriceDetail!
+  priceDetails: [ItemDetail!]!
+  priceDetail(id: String!): ItemDetail!
+  pricesUpdate: [ItemDetail!]!
+  currency: String!
 }
 
 type Mutation {
@@ -108,9 +111,9 @@ type Mutation {
   createInventoryItem(createInventoryItemInput: CreateInventoryItemInput!): InventoryItem!
   updateInventoryItem(updateInventoryItemInput: UpdateInventoryItemInput!): InventoryItem!
   removeInventoryItem(id: String!): InventoryItem!
-  createPriceDetail(createPriceDetailInput: CreatePriceDetailInput!): PriceDetail!
-  updatePriceDetail(updatePriceDetailInput: UpdatePriceDetailInput!): PriceDetail!
-  removePriceDetail(id: String!): PriceDetail!
+  createPriceDetail(createPriceDetailInput: CreateItemDetailInput!): ItemDetail!
+  updatePriceDetail(updatePriceDetailInput: UpdateItemDetailInput!): ItemDetail!
+  removePriceDetail(id: String!): ItemDetail!
 }
 
 input FileInput {
@@ -186,24 +189,21 @@ input UpdateInventoryItemInput {
   id: ID!
 }
 
-input CreatePriceDetailInput {
-  id: ID!
-  createAt: DateTime!
+input CreateItemDetailInput {
   quantity: Float!
   price: Float!
   status: Boolean!
   autoUpdate: Boolean!
   description: String!
-  inventoryItemId: ID!
+  itemId: ID!
 }
 
-input UpdatePriceDetailInput {
-  id: ID!
-  createAt: DateTime
+input UpdateItemDetailInput {
   quantity: Float
   price: Float
   status: Boolean
   autoUpdate: Boolean
   description: String
-  inventoryItemId: ID
+  itemId: ID
+  id: ID!
 }

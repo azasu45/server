@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -13,12 +13,12 @@ model Account {
   type              String
   provider          String
   providerAccountId String
-  refresh_token     String? //@db.Text //Postgre
-  access_token      String? //@db.Text //Postgre
+  refresh_token     String?
+  access_token      String?
   expires_at        Int?
   token_type        String?
   scope             String?
-  id_token          String? //@db.Text //Postgre
+  id_token          String?
   session_state     String?
   user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -38,11 +38,11 @@ model User {
   email        String?       @unique
   password     String?
   image        String?
-  roles        String        @default("user|admin") //Enum
+  roles        String        @default("user|admin")
   status       String        @default("active")
   accounts     Account[]
-  sessions     Session[]
   PersonalData PersonalData?
+  sessions     Session[]
 }
 
 model PersonalData {
@@ -58,7 +58,7 @@ model PersonalData {
   telegram      Int?
   emailVerified DateTime?
   userId        String    @unique
-  User          User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  User          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model VerificationToken {
@@ -71,66 +71,92 @@ model VerificationToken {
 
 model Category {
   id    String @id @default(uuid())
-  name  String @unique
+  name  String @unique @db.VarChar(50)
   items Item[]
 }
 
 model Item {
   id            String         @id @default(uuid())
-  name          String         @unique
+  upadteAt      DateTime?      @updatedAt @db.Timestamptz(6)
+  createAt      DateTime       @default(now()) @db.Timestamptz(6)
   status        Boolean?       @default(true)
-  createAt      DateTime       @default(now())
-  lastUpdateAt  DateTime       @updatedAt
-  lastUpdateBy  String?
-  idCategory    String
-  category      Category       @relation(fields: [idCategory], references: [id], onDelete: Cascade)
+  lastUpdateBy  String?        @db.VarChar(100)
+  name          String         @unique @db.VarChar(50)
+  image         String?        @db.VarChar(200)
+  categoryId    String
   inventoryItem InventoryItem?
+  category      Category       @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  Prices        ItemDetail[]
+}
+
+model ItemDetail {
+  id            String           @id @default(uuid())
+  itemId        String
+  subName       String?
+  createAt      DateTime         @default(now()) @db.Timestamptz(6)
+  updateAt      DateTime?        @updatedAt @db.Timestamptz(6)
+  status        Boolean          @default(true)
+  autoUpdate    Boolean?         @default(false)
+  description   String?          @default("") @db.VarChar(255)
+  price         Float            @default(0) @db.Real
+  quantity      Float            @default(0) @db.Real
+  unit          MeasurementUnits
+  inventoryItem Item             @relation(fields: [itemId], references: [id], onDelete: Cascade)
 }
 
 model Inventory {
-  id             String          @id @default(uuid())
-  name           String          @unique
-  status         Boolean         @default(true)
-  createAt       DateTime        @default(now())
-  inventoryItems InventoryItem[]
+  id             String         @id @default(uuid())
+  name           String         @unique
+  status         Boolean        @default(true)
+  createAt       DateTime       @default(now())
+  inventoryItems InventoryItem?
 }
 
 model InventoryItem {
-  id            String        @id @default(uuid())
-  inventoryId   String?
-  itemId        String?       @unique
-  item          Item?         @relation(fields: [itemId], references: [id], onDelete: SetNull)
-  inventory     Inventory?    @relation(fields: [inventoryId], references: [id], onDelete: SetNull)
-  pricesDetails PriceDetail[]
+  id          String      @id @default(uuid())
+  itemId      String?     @unique
+  inventoryId String?     @unique
+  Quantity    Float       @db.Real
+  inventory   Inventory?  @relation(fields: [inventoryId], references: [id], onDelete: Cascade)
+  item        Item?       @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  OrderItem   OrderItem[]
 }
 
-model PriceDetail {
-  id              String         @id @default(uuid())
-  createAt        DateTime       @default(now())
-  quantity        Float          @default(0)
-  price           Float          @default(0)
-  status          Boolean        @default(true)
-  autoUpdate      Boolean        @default(false)
-  description     String         @default("")
-  inventoryItemId String?
-  InventoryItem   InventoryItem? @relation(fields: [inventoryItemId], references: [id])
+model OrderItem {
+  orderId         String
+  inventoryItemId String
+  quantity        Float         @db.Real
+  price           Float         @db.Real
+  inventoryItem   InventoryItem @relation(fields: [inventoryItemId], references: [id], onDelete: Cascade)
+  order           Order         @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@unique([orderId, inventoryItemId], name: "id")
+}
+
+model Order {
+  id        String      @id @default(uuid())
+  createAt  DateTime    @default(now()) @db.Timestamptz(3)
+  updateAt  DateTime?   @updatedAt @db.Timestamptz(3)
+  number    Int
+  OrderItem OrderItem[]
 }
 
 model CurrencyPrice {
   id       String   @id @default(uuid())
   createAt DateTime @default(now())
+  symbol   String   @default("")
   value    Float    @default(0)
   name     String
 }
 
 model AccountingEntries {
   id          String     @id @default(uuid())
+  createAt    DateTime   @default(now())
   number      Int        @default(0)
-  descripcion String
   debit       Float
   credit      Float
-  createAt    DateTime   @default(now())
   acountsId   String?
+  descripcion String
   Acounts     AccountsC? @relation(fields: [acountsId], references: [id])
 }
 
@@ -139,4 +165,10 @@ model AccountsC {
   number            Int                 @default(0)
   descripcion       String
   accountingEntries AccountingEntries[]
+}
+
+enum MeasurementUnits {
+  KG
+  LT
+  UNIT
 }

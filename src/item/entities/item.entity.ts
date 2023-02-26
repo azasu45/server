@@ -10,6 +10,7 @@ import { Category } from '../../category/entities/category.entity';
 import * as GraphQLUpload from 'graphql-upload/GraphQLUpload.js';
 import { FileUpload } from '../../common/types/index';
 import { InventoryItem } from 'src/inventory-item/entities/inventory-item.entity';
+import { Inventory } from '../../inventory/entities/inventory.entity';
 
 @ObjectType()
 export class Item {
@@ -20,6 +21,10 @@ export class Item {
   @Field(() => String)
   @IsString()
   name: string;
+
+  @Field(() => String)
+  @IsString()
+  image?: string;
 
   @Field(() => Date)
   @IsDate()
@@ -38,4 +43,7 @@ export class Item {
 
   @Field(() => InventoryItem, { nullable: true })
   inventoryItem?: InventoryItem | null;
+
+  @Field(() => Inventory, { nullable: true })
+  inventory?: Inventory | null;
 }

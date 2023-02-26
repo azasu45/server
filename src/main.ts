@@ -17,11 +17,8 @@ async function bootstrap() {
     }),
   );
   const prismaService = app.get(PrismaService);
-
   await prismaService.enableShutdownHooks(app);
-
   app.use(graphqlUploadExpress({ maxFileSize: 1000000, maxFiles: 10 }));
-
   await app.listen(3001);
 }
 bootstrap();

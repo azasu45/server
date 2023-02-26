@@ -13,6 +13,7 @@ export class InventoryItemService {
     const { inventoryId, itemId } = createInventoryItemInput;
     return await this.prisma.inventoryItem.create({
       data: {
+        Quantity: 0,
         item: {
           connect: {
             id: itemId,

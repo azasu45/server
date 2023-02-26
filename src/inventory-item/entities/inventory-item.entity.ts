@@ -18,5 +18,4 @@ export class InventoryItem {
 
   @Field(() => Item, { nullable: true })
   item?: Item;
-  //priceDetail ItemDetail[]
 }
